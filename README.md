@@ -1,58 +1,222 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LMC Fencing & Gates
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Marketing site and admin tooling for LMC Fencing & Gates, built with Laravel 13, Livewire 3, Tailwind 4, and Vite.
 
-## About Laravel
+This project includes:
+- a public landing page
+- quote request capture
+- an admin dashboard
+- invoice generation and invoice tracking
+- imported Facebook customer reviews
+- offline-capable invoice draft storage for iPhone use
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.3
+- Laravel 13
+- Livewire 3
+- MySQL
+- Vite
+- Tailwind CSS 4
+- `barryvdh/laravel-dompdf` for PDF invoices
+- Playwright for Facebook review scraping
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Main Routes
 
-## Learning Laravel
+- `/` public landing page
+- `/generate` invoice generator
+- `/login` admin login
+- `/admin` admin dashboard
+- `/admin/invoices` saved invoices table
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Features
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Public Site
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- custom landing page for LMC Fencing & Gates
+- rotating customer review cards driven from database records
+- quote request form stored in the database
+- site visit tracking for the homepage
 
-## Agentic Development
+### Admin
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- overview dashboard for quote requests and site visits
+- requests tab with request details
+- invoices page with:
+  - reference
+  - status
+  - invoice and due dates
+  - job
+  - billed to
+  - total owed
+- quick invoice status updates from the table
+
+### Invoice Generator
+
+- live invoice preview
+- PDF download
+- send by email
+- WhatsApp share flow
+- invoice persistence into `invoice_records`
+
+### Offline Invoice Drafts
+
+The invoice page has a first-pass offline workflow for iPhone:
+
+- caches the invoice page shell with a service worker
+- stores invoice form drafts locally on the device
+- allows drafts to be queued while offline
+- syncs queued drafts back to Laravel once online
+
+Current limitation:
+- offline draft entry and later sync work
+- server-side PDF generation still requires internet
+
+## Setup
+
+### 1. Install dependencies
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+npm install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Environment
 
-## Contributing
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Set your database credentials in `.env`.
 
-## Code of Conduct
+### 3. Run migrations
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan migrate
+```
 
-## Security Vulnerabilities
+### 4. Build frontend assets
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+npm run build
+```
 
-## License
+### 5. Start locally
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Quick start:
+
+```bash
+php artisan serve
+```
+
+For the full local dev stack:
+
+```bash
+composer run dev
+```
+
+## Useful Commands
+
+### Create an Admin User
+
+```bash
+php artisan admin:create-user "Your Name" "you@example.com" "secure-password"
+```
+
+### Import Saved Facebook Reviews
+
+```bash
+php artisan reviews:import-facebook-capture
+```
+
+### Scrape Facebook Reviews
+
+```bash
+php artisan facebook:scrape-reviews "https://www.facebook.com/lmclandscaping1/reviews" --limit=10 --save=facebook/lmclandscaping1-reviews.json
+```
+
+## Database Tables
+
+Main project tables:
+
+- `users`
+- `quote_requests`
+- `customer_reviews`
+- `site_visits`
+- `invoice_records`
+
+## Invoice Record Flow
+
+Invoice records are created or updated when the generator is used for:
+
+- PDF download
+- email send
+- WhatsApp share
+- offline sync from a cached device draft
+
+Saved invoice metadata includes:
+
+- `reference`
+- `status`
+- `invoice_date`
+- `due_date`
+- `job_address`
+- `client_name`
+- `total_due`
+- `last_action`
+- full invoice `payload`
+
+## Offline iPhone Notes
+
+To use the invoice page offline on iPhone:
+
+1. Open `/generate` once while online.
+2. Let the page finish loading.
+3. Optionally add it to the Home Screen.
+4. If offline, fill out the invoice and use `Save Offline`.
+5. Reopen the page when online and use `Sync Drafts` if it does not sync automatically.
+
+## Deployment Notes
+
+Minimum deployment steps after pulling new code:
+
+```bash
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+npm install
+npm run build
+php artisan view:clear
+php artisan view:cache
+```
+
+If config or routes are cached in your environment, also run:
+
+```bash
+php artisan config:cache
+php artisan route:cache
+```
+
+## Git
+
+This repo is configured to use GitHub over SSH.
+
+Example remote:
+
+```bash
+git remote add origin git@github.com:DylanSatelle/lmc1.git
+```
+
+Standard workflow:
+
+```bash
+git add .
+git commit -m "Your message"
+git push
+```
+
+## Project Notes
+
+- Facebook scraping is best-effort only and may break if Facebook changes its markup or access rules.
+- Some imported reviews were shortened to fit the landing-page testimonial cards cleanly.
+- The invoice system currently uses Laravel server-side PDF rendering, not client-side PDF generation.
