@@ -1,0 +1,189 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Barlow', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Oswald', ui-sans-serif, sans-serif;
+    --font-condensed: 'Barlow Condensed', ui-sans-serif, sans-serif;
+
+    --color-forge: #0c0f12;
+    --color-steel: #14181e;
+    --color-iron: #1c2128;
+    --color-chain: #252d37;
+    --color-rust: #c83e0a;
+    --color-rust-hot: #e8501a;
+    --color-rust-dim: #7a2606;
+    --color-ash: #6e7d8c;
+    --color-silver: #a8b8c4;
+    --color-cream: #f5f2ed;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background: linear-gradient(155deg, #0c0f12 0%, #14181e 50%, #190e08 100%);
+        min-height: 100vh;
+    }
+}
+
+@layer components {
+    .forge-noise {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .forge-noise::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.03;
+        z-index: 60;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .clip-rust {
+        clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    }
+
+    .clip-rust-sm {
+        clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    }
+
+    .steel-card {
+        background: linear-gradient(180deg, rgba(37, 45, 55, 0.64), rgba(28, 33, 40, 0.96));
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .section-shell {
+        @apply mx-auto w-full max-w-7xl px-6 lg:px-14;
+    }
+
+    .section-tag {
+        @apply font-condensed text-rust flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.28em];
+    }
+
+    .section-tag::after {
+        content: '';
+        width: 2.25rem;
+        height: 1px;
+        background: currentColor;
+    }
+
+    .section-title {
+        @apply font-display text-4xl leading-none font-bold uppercase tracking-[0.01em] md:text-5xl;
+    }
+
+    .section-subtitle {
+        @apply max-w-2xl text-base leading-8 text-ash;
+    }
+
+    .ticker-track {
+        width: max-content;
+        animation: ticker-scroll 28s linear infinite;
+    }
+
+    .reveal-up {
+        opacity: 0;
+        transform: translateY(24px);
+        animation: reveal-up 0.7s ease forwards;
+    }
+
+    .scroll-reveal {
+        opacity: 0;
+        transform: translateY(32px);
+        transition:
+            opacity 0.65s ease,
+            transform 0.65s ease;
+        transition-delay: var(--reveal-delay, 0s);
+    }
+
+    .scroll-reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .delay-1 { animation-delay: 0.08s; }
+    .delay-2 { animation-delay: 0.16s; }
+    .delay-3 { animation-delay: 0.24s; }
+    .delay-4 { animation-delay: 0.32s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-\[hero-gallery_24s_linear_infinite\] {
+        animation: none !important;
+        opacity: 1 !important;
+    }
+
+    .testimonial-panel {
+        opacity: 0 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+
+    .scroll-reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
+@keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@keyframes reveal-up {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes hero-gallery {
+    0% {
+        opacity: 0;
+        transform: scale(1.02);
+    }
+
+    4%,
+    28% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    33%,
+    100% {
+        opacity: 0;
+        transform: scale(1.03);
+    }
+}
+
+.testimonial-panel {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+    transition:
+        opacity 0.6s ease,
+        transform 0.6s ease;
+    will-change: opacity, transform;
+    pointer-events: none;
+}
+
+.testimonial-panel.is-active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}

@@ -1,0 +1,17 @@
+{
+  "name": "LMC Invoice Generator",
+  "short_name": "LMC Invoices",
+  "start_url": "/generate",
+  "display": "standalone",
+  "background_color": "#0c0f12",
+  "theme_color": "#c83e0a",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/storage/lmc.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
